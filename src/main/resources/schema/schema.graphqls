@@ -2,7 +2,18 @@ schema {
     query: Query
 }
 
-# meaningless query
 type Query {
-    num: Int
+    users: [User]
+    cards: [Card]
+}
+
+type User {
+    id: ID!
+    name: String!
+}
+
+type Card {
+    id: ID!
+    number: String!
+    company: String!
 }
