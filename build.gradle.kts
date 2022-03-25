@@ -17,6 +17,9 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:3.10.2"))
+    implementation("com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter")
+
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

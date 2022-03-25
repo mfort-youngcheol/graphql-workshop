@@ -1,0 +1,8 @@
+schema {
+    query: Query
+}
+
+# meaningless query
+type Query {
+    num: Int
+}
