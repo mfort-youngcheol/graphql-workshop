@@ -1,9 +1,6 @@
 package kr.co.mfort.graphql
 
-import com.netflix.graphql.dgs.DgsComponent
-import com.netflix.graphql.dgs.DgsMutation
-import com.netflix.graphql.dgs.DgsQuery
-import com.netflix.graphql.dgs.InputArgument
+import com.netflix.graphql.dgs.*
 import kr.co.mfort.graphql.entity.CardEntity
 import kr.co.mfort.graphql.entity.CardEntityRepository
 import kr.co.mfort.graphql.entity.UserEntity
@@ -47,6 +44,18 @@ class QueryDataFetcher(
         UserSchema(id = 4L, name = "유저4"),
         UserSchema(id = 5L, name = "유저5"),
     )
+
+    @DgsData(parentType = "User", field = "card")
+    fun userCard(dfe: DgsDataFetchingEnvironment): CardSchema? {
+        val user = dfe.getSource<UserSchema>()
+
+        return when (user.id) {
+            1L -> CardSchema(id = 1L, number = "111-111-111", company = "BC")
+            2L -> CardSchema(id = 2L, number = "222-222-222", company = "SAMSUNG")
+            3L -> CardSchema(id = 3L, number = "333-333-333", company = "SINHAN")
+            else -> null
+        }
+    }
 
     @DgsQuery(field = "cards")
     fun cards(): List<CardSchema> {
