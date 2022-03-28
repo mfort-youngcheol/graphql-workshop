@@ -46,12 +46,14 @@ class QueryDataFetcher(
             .map { UserSchema(id = it.id, name = it.name) }
 
     @DgsData(parentType = "User", field = "card")
-    fun userCard(dfe: DgsDataFetchingEnvironment): CardSchema? {
+    fun userCard(dfe: DgsDataFetchingEnvironment): CompletableFuture<CardSchema?> {
         val user = dfe.getSource<UserSchema>()
-        val card = this.cardEntityRepository.findByUserId(user.id)
-        return card?.let {
-            CardSchema(id = card.id, number = card.number, company = card.company)
-        }
+//        val card = this.cardEntityRepository.findByUserId(user.id)
+//        return card?.let {
+//            CardSchema(id = card.id, number = card.number, company = card.company)
+//        }
+        val userCardDataLoader = dfe.getDataLoader<Long, CardSchema>(UserCardDataLoader::class.java)
+        return userCardDataLoader.load(user.id)
     }
 
     @DgsQuery(field = "cards")
