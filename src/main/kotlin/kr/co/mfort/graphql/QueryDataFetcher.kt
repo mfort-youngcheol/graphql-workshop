@@ -35,34 +35,21 @@ class MutationDataFetcher(
 @DgsComponent
 class QueryDataFetcher(
     private val userEntityRepository: UserEntityRepository,
+    private val cardEntityRepository: CardEntityRepository,
 ) {
     @DgsQuery(field = "users")
-    fun users(): List<UserSchema> = listOf(
-        UserSchema(id = 1L, name = "유저1"),
-        UserSchema(id = 2L, name = "유저2"),
-        UserSchema(id = 3L, name = "유저3"),
-        UserSchema(id = 4L, name = "유저4"),
-        UserSchema(id = 5L, name = "유저5"),
-    )
+    fun users(): List<UserSchema> =
+        this.userEntityRepository.findAll()
+            .map { UserSchema(id = it.id, name = it.name) }
 
     @DgsData(parentType = "User", field = "card")
     fun userCard(dfe: DgsDataFetchingEnvironment): CardSchema? {
         val user = dfe.getSource<UserSchema>()
-
-        return when (user.id) {
-            1L -> CardSchema(id = 1L, number = "111-111-111", company = "BC")
-            2L -> CardSchema(id = 2L, number = "222-222-222", company = "SAMSUNG")
-            3L -> CardSchema(id = 3L, number = "333-333-333", company = "SINHAN")
-            else -> null
-        }
+        return this.cardEntityRepository.findByUserId(user.id)
     }
 
     @DgsQuery(field = "cards")
-    fun cards(): List<CardSchema> {
-        return listOf(
-            CardSchema(id = 1L, number = "111-111-111", company = "BC"),
-            CardSchema(id = 2L, number = "222-222-222", company = "SAMSUNG"),
-            CardSchema(id = 3L, number = "333-333-333", company = "SINHAN"),
-        )
-    }
+    fun cards(): List<CardSchema> =
+        this.cardEntityRepository.findAll()
+            .map { CardSchema(id = it.id, number = it.number, company = it.company) }
 }

@@ -2,3 +2,7 @@ dgs:
   graphql:
     graphiql:
       enabled: true
+
+spring:
+  jpa:
+    show-sql: true
