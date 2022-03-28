@@ -1,12 +1,44 @@
 package kr.co.mfort.graphql
 
 import com.netflix.graphql.dgs.DgsComponent
+import com.netflix.graphql.dgs.DgsMutation
 import com.netflix.graphql.dgs.DgsQuery
+import com.netflix.graphql.dgs.InputArgument
+import kr.co.mfort.graphql.entity.CardEntity
+import kr.co.mfort.graphql.entity.CardEntityRepository
+import kr.co.mfort.graphql.entity.UserEntity
+import kr.co.mfort.graphql.entity.UserEntityRepository
 import kr.co.mfort.graphql.schema.CardSchema
 import kr.co.mfort.graphql.schema.UserSchema
 
 @DgsComponent
-class QueryDataFetcher {
+class MutationDataFetcher(
+    private val userEntityRepository: UserEntityRepository,
+    private val cardEntityRepository: CardEntityRepository,
+) {
+    @DgsMutation(field = "user")
+    fun user(@InputArgument("name") name: String): UserSchema {
+        val userEntity = this.userEntityRepository.save(UserEntity(name = name))
+        return UserSchema(id = userEntity.id, name = userEntity.name)
+    }
+
+    @DgsMutation(field = "card")
+    fun card(
+        @InputArgument("userId") userId: Long,
+        @InputArgument("number") number: String,
+        @InputArgument("company") company: String
+    ): CardSchema {
+        val cardEntity = this.cardEntityRepository.save(
+            CardEntity(userId = userId, number = number, company = company)
+        )
+        return CardSchema(id = cardEntity.id, number = cardEntity.number, company = cardEntity.company)
+    }
+}
+
+@DgsComponent
+class QueryDataFetcher(
+    private val userEntityRepository: UserEntityRepository,
+) {
     @DgsQuery(field = "users")
     fun users(): List<UserSchema> = listOf(
         UserSchema(id = 1L, name = "유저1"),
