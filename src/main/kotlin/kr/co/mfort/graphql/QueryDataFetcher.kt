@@ -7,6 +7,9 @@ import kr.co.mfort.graphql.entity.UserEntity
 import kr.co.mfort.graphql.entity.UserEntityRepository
 import kr.co.mfort.graphql.schema.CardSchema
 import kr.co.mfort.graphql.schema.UserSchema
+import org.dataloader.MappedBatchLoader
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
 
 @DgsComponent
 class MutationDataFetcher(
@@ -45,11 +48,29 @@ class QueryDataFetcher(
     @DgsData(parentType = "User", field = "card")
     fun userCard(dfe: DgsDataFetchingEnvironment): CardSchema? {
         val user = dfe.getSource<UserSchema>()
-        return this.cardEntityRepository.findByUserId(user.id)
+        val card = this.cardEntityRepository.findByUserId(user.id)
+        return card?.let {
+            CardSchema(id = card.id, number = card.number, company = card.company)
+        }
     }
 
     @DgsQuery(field = "cards")
     fun cards(): List<CardSchema> =
         this.cardEntityRepository.findAll()
             .map { CardSchema(id = it.id, number = it.number, company = it.company) }
+}
+
+@DgsDataLoader(name = "userCardDataLoader")
+class UserCardDataLoader(
+    private val cardEntityRepository: CardEntityRepository,
+) : MappedBatchLoader<Long, CardSchema> {
+    override fun load(userIds: MutableSet<Long>): CompletionStage<Map<Long, CardSchema>> {
+        return CompletableFuture.supplyAsync {
+            cardEntityRepository.findAllByUserIdIn(userIds)
+                .associateBy { it.userId }
+                .map { (userId, card) ->
+                    userId to CardSchema(id = card.id, number = card.number, company = card.company)
+                }.toMap()
+        }
+    }
 }
