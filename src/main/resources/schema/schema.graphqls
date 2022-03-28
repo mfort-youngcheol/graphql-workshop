@@ -1,5 +1,11 @@
 schema {
+    mutation: Mutation
     query: Query
+}
+
+type Mutation {
+    user(name: String!): User!
+    card(userId: ID!, number: String!, company: String!): Card!
 }
 
 type Query {
