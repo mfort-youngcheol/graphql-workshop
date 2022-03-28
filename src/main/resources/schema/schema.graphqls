@@ -16,6 +16,7 @@ type Query {
 type User {
     id: ID!
     name: String!
+    card: Card
 }
 
 type Card {
