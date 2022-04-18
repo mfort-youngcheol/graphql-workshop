@@ -4,23 +4,36 @@ schema {
 }
 
 type Mutation {
+    # 새로운 유저를 추가한다
     user(name: String!): User!
+
+    # 유저의 카드 정보를 추가한다
     card(userId: ID!, number: String!, company: String!): Card!
 }
 
 type Query {
+    # 모든 유저를 조회한다
     users: [User]
+    # 모든 카드 정보를 조회한다
     cards: [Card]
 }
 
+# 서비스 사용 유저 정보
 type User {
+    # ID (숫자)
     id: ID!
+    # 이름
     name: String!
+    # 유저가 사용 중인 카드 정보
     card: Card
 }
 
+# 카드 정보
 type Card {
+    # ID (숫자)
     id: ID!
+    # 카드 번호
     number: String!
+    # 카드사
     company: String!
 }
